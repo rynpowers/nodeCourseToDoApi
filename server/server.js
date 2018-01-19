@@ -4,11 +4,11 @@ var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todos');
-var {users} = require('./models/user');
+var {User} = require('./models/user');
 
 var app = express();
 
-var port = process.env.PORT;
+var port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
@@ -44,7 +44,7 @@ app.get('/todos/:id', (req, res) => {
   }).catch((e) => res.status(400).send())
 });
 
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log('Server running on port '+ port);
 });
 
