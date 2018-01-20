@@ -129,8 +129,8 @@ describe('DELETE /todos/:id', () => {
         done();
       }).catch((e) => done(e))
     });
-
   });
+
   it('should produce a 404 not found status', (done) => {
     request(app)
     .delete('/todos/123')
