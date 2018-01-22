@@ -243,7 +243,7 @@ describe('POST /users', () => {
           expect(user).not.toBe(null)
           expect(user.password).not.toBe(password);
           done()
-        })
+        }).catch((e) => done(e));
       }
     })
   })
@@ -282,5 +282,53 @@ describe('POST /users', () => {
       .send({email, password})
       .expect(400)
     .end(done)
+  })
+})
+
+describe('POST /users/login', () => {
+  it('should login user and return auth token', (done) => {
+
+    request(app)
+      .post('/users/login')
+      .send({email: users[1].email, password: users[1].password})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.email).toBe(users[1].email);
+        expect(res.header['x-auth']).not.toBe(null);
+      })
+    .end((err, res) => {
+      if (err) {
+        return done(err);
+      }
+      User.findById(users[1]._id).then((user) => {
+        expect(user.tokens[0].access).toBe('auth');
+        expect(user.tokens[0].token).toBe(res.header['x-auth']);
+        done()
+      }).catch((e) => done(e));
+    });
+  })
+
+  it('should reject invalid login', (done) => {
+
+    var email = users[1].email
+    var password = 'assword'
+
+    request(app)
+      .post('/users/login')
+      .send({email: users[1].email, password})
+      .expect(400)
+      .expect((res) => {
+        expect(res.header['x-auth']).toBe(undefined);
+      })
+    .end((err, res) => {
+      if (err) {
+        return done(err);
+      }
+
+      User.findById(users[1]._id).then((user) => {
+        expect(user.tokens[0]).toBe(undefined)
+        done()
+      }).catch((e) => done(e));
+    });
   })
 })
