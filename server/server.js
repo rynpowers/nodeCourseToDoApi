@@ -7,6 +7,7 @@ const {ObjectID} = require('mongodb');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todos');
 const {User} = require('./models/user');
+const {authenticate} = require('./middleware/authenticate')
 
 var app = express();
 
@@ -78,7 +79,6 @@ app.patch('/todos/:id', (req, res) => {
     res.send({todo});
   }).catch((e) => res.status(400).send());
 });
-
 // User routes
 
 app.post('/users', (req, res) => {
@@ -89,10 +89,14 @@ app.post('/users', (req, res) => {
   user.save().then(() => {
     return user.generateAuthToken();
   }).then((token) => {
-    // var userObject = _.pick(user, ['_id', 'email'])
     res.header('x-auth', token).send(user);
   }).catch((e) => res.status(400).send(e));
 });
+
+app.get('/users/me', authenticate, (req, res) => {
+  var user = req.user;
+  res.send(user);
+})
 
 app.listen(port, () => {
   console.log('Server running on port '+ port);
