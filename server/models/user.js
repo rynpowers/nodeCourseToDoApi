@@ -50,6 +50,15 @@ userSchema.methods.toJSON = function () {
   return _.pick(userObject, ['_id', 'email'])
 }
 
+userSchema.methods.removeToken = function (token) {
+  return this.update({
+    $pull: {
+      tokens: {
+        token
+      }
+    }
+  });
+}
 // statics apply to model not instance of model
 userSchema.statics.findByToken = function (token) {
   var decoded;
