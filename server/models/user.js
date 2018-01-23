@@ -37,7 +37,7 @@ var userSchema = new mongoose.Schema({
 
 userSchema.methods.generateAuthToken = function () {
   var access = 'auth';
-  var token = jwt.sign({_id: this._id.toHexString(), access}, 'abc123').toString();
+  var token = jwt.sign({_id: this._id.toHexString(), access}, process.env.JWT_SECRET).toString();
   this.tokens.push({access, token})
 
   return this.save().then(() => {
@@ -64,7 +64,7 @@ userSchema.statics.findByToken = function (token) {
   var decoded;
 
   try {
-    decoded = jwt.verify(token, 'abc123')
+    decoded = jwt.verify(token, process.env.JWT_SECRET)
   }catch (e) {
     return Promise.reject();
   }
